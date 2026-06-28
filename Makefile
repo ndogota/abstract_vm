@@ -1,5 +1,6 @@
-CG = gcc
-CFLAGS = -Wall -Wextra -Werror
+CC = gcc
+CFLAGS = -Wall -Wextra -Werror -std=c11
+LDLIBS = -lm
 
 SRC_DIR := src
 INCLUDE_DIR := include
@@ -11,11 +12,7 @@ SRC := 	$(SRC_DIR)/main.c      \
 		$(SRC_DIR)/linked.c    \
 		$(SRC_DIR)/lines.c
 
-OBJ := 	$(SRC_DIR)/main.o      \
-		$(SRC_DIR)/tools.o     \
-		$(SRC_DIR)/core.o      \
-		$(SRC_DIR)/linked.o    \
-		$(SRC_DIR)/lines.o
+OBJ := $(SRC:.c=.o)
 
 HEADER := 	$(INCLUDE_DIR)/main.h      \
 			$(INCLUDE_DIR)/tools.h     \
@@ -23,29 +20,21 @@ HEADER := 	$(INCLUDE_DIR)/main.h      \
 			$(INCLUDE_DIR)/linked.h    \
 			$(INCLUDE_DIR)/lines.h
 
-GREEN_COLOR = \033[0;92m
-RED_COLOR = \033[0;91m
-OFF_COLOR = \033[0m
+all: $(EXECUTABLE)
 
-all: abstractvm_bin
+$(EXECUTABLE): $(OBJ)
+	$(CC) $(CFLAGS) -o $(EXECUTABLE) $(OBJ) $(LDLIBS)
 
-$(OBJ): $(SRC)
-	@echo "${GREEN_COLOR}Compiling objects :${OFF_COLOR}"
-	$(CG) -c $(SRC)
-	mv *.o $(SRC_DIR)
-
-abstractvm_bin: $(OBJ)
-	@echo "${GREEN_COLOR}Compiling executable :${OFF_COLOR}"
-	$(CG) $(CFLAGS) -o $(EXECUTABLE) $(OBJ) $(HEADER) -lm
+# Strict warning flags are enforced here, at the compile step.
+$(SRC_DIR)/%.o: $(SRC_DIR)/%.c $(HEADER)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	@echo "${RED_COLOR}Remove objects files :${OFF_COLOR}"
-	rm -f $(SRC_DIR)/*.o
+	rm -f $(OBJ)
 
 fclean: clean
-	@echo "${RED_COLOR}Remove outputs files :${OFF_COLOR}"
 	rm -f $(EXECUTABLE)
 
-.PHONY : clean
-
 re: fclean all
+
+.PHONY: all clean fclean re
