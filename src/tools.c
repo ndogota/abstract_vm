@@ -1,9 +1,4 @@
-/*
-** ETNA PROJECT, 06/11/2020 by dogota_n and avenia_r
-** AbstractVM
-** File description:
-**      tools.c : usual tools functions
-*/
+// tools.c : low level helpers (printing, parsing, file IO, math)
 
 #include "../include/tools.h"
 
@@ -73,7 +68,7 @@ double my_atof(const char *string)
 
 	if (string[0] == '-') {
 		sign = -1;
-		(unsigned char) *string++;
+		string++;
 	}
 
 	// checking if the string have a double format
@@ -138,30 +133,31 @@ int file_length(char *file_path)
     return (length);
 }
 
-// Malloc a string and return the dump of a file in a string (Return 0 if
+// Read the whole file into a freshly allocated, null terminated string.
+// Returns NULL on an empty file, an invalid length or an open/read error.
 char* file_dumper(char *file_path, int length)
 {
-    char *dump = (char* )malloc((length + 1) * sizeof(char));
+    if (length <= 0)
+        return NULL;
 
-    if (length != 0) {
-        char c = 0;
-	    int i;
+    char *dump = (char *) malloc((length + 1) * sizeof(char));
+    if (dump == NULL)
+        return NULL;
 
-        int fd = open(file_path, O_RDONLY);
+    int fd = open(file_path, O_RDONLY);
+    if (fd == -1) {
+        free(dump);
+        return NULL;
+    }
 
-        if (fd == -1)
-            return 0;
+    char c = 0;
+    int i = 0;
+    while (i < length && read(fd, &c, 1) > 0)
+        dump[i++] = c;
+    dump[i] = '\0';
 
-        for (i = 0; (read(fd,&c,1)) != 0; i++)
-            dump[i] = c;
-
-	    dump[i] = '\0';
-
-	    close(fd);
-    } else
-        return 0;
-
-    return (dump);
+    close(fd);
+    return dump;
 }
 
 // print a specific line of a file
