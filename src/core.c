@@ -57,10 +57,12 @@ int assert_checker(char **first_parameter, double value, int *error, enum mode m
 {
 	if (!strcmp(*first_parameter, "int8") || !strcmp(*first_parameter, "int16") ||
 		!strcmp(*first_parameter, "int32") || !strcmp(*first_parameter, "float") ||
-		!strcmp(*first_parameter, "double"))\
+		!strcmp(*first_parameter, "double")) {
 		launch_assert(value, mode);
-	else
-		*error = -1;
+		return 0;
+	}
+	*error = -1;
+	return -1;
 }
 
 // calling assert function with the good arguments
@@ -141,7 +143,7 @@ void instruction_one(const char *instruction, int *error, enum mode mode)
 			*error = -4;
 		}
 	} else if (!strcmp(instruction, "add")) {
-		if (mode == FUNC && plates_count > 0) {
+		if (mode == FUNC && plates_count > 1) {
 			first = add_function(first);
 			plates_count--;
 		} else if (mode == FUNC) {
@@ -157,7 +159,7 @@ void instruction_one(const char *instruction, int *error, enum mode mode)
 			*error = -4;
 		}
 	} else if (!strcmp(instruction, "mul")) {
-		if (mode == FUNC && plates_count > 0) {
+		if (mode == FUNC && plates_count > 1) {
 			first = mul_function(first);
 			plates_count--;
 		} else if (mode == FUNC) {
@@ -165,7 +167,7 @@ void instruction_one(const char *instruction, int *error, enum mode mode)
 			*error = -4;
 		}
 	} else if (!strcmp(instruction, "div")) {
-		if (mode == FUNC && plates_count > 0) {
+		if (mode == FUNC && plates_count > 1) {
 			first = div_function(first);
 			plates_count--;
 		} else if (mode == FUNC) {
@@ -173,7 +175,7 @@ void instruction_one(const char *instruction, int *error, enum mode mode)
 			*error = -4;
 		}
 	} else if (!strcmp(instruction, "mod")) {
-		if (mode == FUNC && plates_count > 0) {
+		if (mode == FUNC && plates_count > 1) {
 			first = mod_function(first);
 			plates_count--;
 		} else if (mode == FUNC) {
@@ -271,28 +273,38 @@ int syntax_looker(const char *dump, char* file_name)
 
 	// saving the file in a array of string
 	char** array_of_lines = array_parser(dump, count_line);
+	if (array_of_lines == NULL)
+		return -1;
 
-	// parsing the array for simplifying the syntax checking
-	for (int i = 0; i < count_line; i++)
-		array_of_lines[i] = line_parser(array_of_lines[i], big_word);
+	// parsing the array for simplifying the syntax checking, replacing each
+	// raw line with its normalised version and freeing the raw one
+	for (int i = 0; i < count_line; i++) {
+		char* parsed = line_parser(array_of_lines[i], big_word);
+		free(array_of_lines[i]);
+		array_of_lines[i] = parsed;
+	}
 
 	if (exit_looker(array_of_lines, count_line) == 0) {
 		my_putstr("You must specify a end instruction in ");
 		my_putstr(file_name);
 		my_putchar('\n');
+		free_array(array_of_lines, count_line);
 		return -1;
 	}
 
 	// launching the syntax checking
-	if (instruction_syntax(array_of_lines, dump, count_line, SYNTAX) == -1)
+	if (instruction_syntax(array_of_lines, dump, count_line, SYNTAX) == -1) {
+		free_array(array_of_lines, count_line);
 		return -1;
+	}
 
 	// launching functions
 	instruction_syntax(array_of_lines, dump, count_line, FUNC);
 
 	// freeing the stack and the array of strings
-	free_stack(first);
+	first = free_stack(first);
 	free_array(array_of_lines, count_line);
+	return 0;
 }
 
 int process_arg(int argc, char **argv)
@@ -303,10 +315,12 @@ int process_arg(int argc, char **argv)
 		// dumping the file content on a string
 		char* file_dump = file_dumper(argv[1], length_file);
 
-		if (length_file > 0) {
+		if (length_file > 0 && file_dump != NULL) {
 			syntax_looker(file_dump, argv[1]);
+			free(file_dump);
 			return 0;
 		}
+		free(file_dump);
 		my_putstr("The specified file doesnt exist or is empty : ");
 		my_putstr(argv[1]);
 		my_putchar('\n');

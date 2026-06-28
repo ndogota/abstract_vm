@@ -67,6 +67,10 @@ int save_value(struct stack *node, double data, enum list_type type)
 // returning the value of the plate
 double get_value(stack_plate plate)
 {
+	if (plate == NULL) {
+		my_putstr("The plate is empty, cannot perform get_value().\n");
+		return 0;
+	}
 	switch (plate->type) {
 		case INT_8:
 			return plate->lifo.int8_lifo;
@@ -80,7 +84,7 @@ double get_value(stack_plate plate)
 			return plate->lifo.double_lifo;
 		default:
 			my_putstr("The plate doesnt have value, cannot perform get_value().\n");
-			break;
+			return 0;
 	}
 }
 
@@ -138,8 +142,10 @@ stack_plate push_function(stack_plate first, double data, enum list_type type)
 {
 	stack_plate temp;
 	temp=get_plate();
-	if (save_value(temp, data, type) == -3)
-		return 0;
+	if (save_value(temp, data, type) == -3) {
+		free(temp);
+		return first;
+	}
 	temp->next=first;
 	return temp;
 }
