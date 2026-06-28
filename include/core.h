@@ -1,9 +1,7 @@
-/*
-** ETNA PROJECT, 06/11/2020 by dogota_n and avenia_r
-** AbstractVM
-** File description:
-**      core.h headers for core.c functions
-*/
+// core.h : interpreter declarations (argument handling, syntax, dispatch)
+
+#ifndef CORE_H
+#define CORE_H
 
 #include <stdlib.h>
 
@@ -40,3 +38,5 @@ int exit_looker(char** array_of_lines, int count_line);
 
 // cleaning functions
 void free_array(char** array_of_lines, int count_line);
+
+#endif

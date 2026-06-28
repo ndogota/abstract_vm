@@ -1,8 +1,8 @@
-/*
-** ETNA PROJECT, 06/11/2020 by dogota_n and avenia_r
-** AbstractVM
-** File description:
-**      main.h headers for main function
-*/
+// main.h : entry point declarations
+
+#ifndef MAIN_H
+#define MAIN_H
 
 #include "../include/core.h"
+
+#endif

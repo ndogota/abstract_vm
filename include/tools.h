@@ -1,9 +1,7 @@
-/*
-** ETNA PROJECT, 06/11/2020 by dogota_n and avenia_r
-** AbstractVM
-** File description:
-**      tools.h headers for tools.c functions
-*/
+// tools.h : declarations for the low level helpers
+
+#ifndef TOOLS_H
+#define TOOLS_H
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -27,3 +25,5 @@ void print_line(const char *file, int line_number);
 
 // bits functions
 int check_interval(double value, int bits);
+
+#endif

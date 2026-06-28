@@ -1,9 +1,4 @@
-/*
-** ETNA PROJECT, 06/11/2020 by dogota_n and avenia_r
-** AbstractVM
-** File description:
-**      main.c : function sending arguments
-*/
+// main.c : entry point, forwards the command line arguments to the interpreter
 
 #include "../include/main.h"
 

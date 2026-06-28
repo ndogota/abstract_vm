@@ -1,9 +1,7 @@
-/*
-** ETNA PROJECT, 06/11/2020 by dogota_n and avenia_r
-** AbstractVM
-** File description:
-**      linked.h headers for linked.c functions
-*/
+// linked.h : declarations for the typed linked-list stack
+
+#ifndef LINKED_H
+#define LINKED_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -57,3 +55,5 @@ void print_function(struct stack *p);
 
 // cleaning functions
 stack_plate free_stack(stack_plate first);
+
+#endif
